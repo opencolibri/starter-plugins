@@ -116,6 +116,7 @@ final class PluginTasksTest extends TestCase
         static::assertSame([
             'acme_loyalty' => 'acme/sylius-loyalty-plugin',
             'cms' => 'sylius/cms-plugin',
+            'wishlist' => 'sylius/wishlist-plugin',
         ], PluginTasks::packages());
     }
 

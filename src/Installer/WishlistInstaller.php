@@ -11,7 +11,6 @@ use OpenColibri\Starter\Core\Util\Database;
 use OpenColibri\Starter\Core\Util\Docker;
 use OpenColibri\Starter\Core\Util\Symfony;
 
-use function Castor\fs;
 use function Castor\io;
 
 final readonly class WishlistInstaller implements PluginInstallerInterface
@@ -26,9 +25,9 @@ final readonly class WishlistInstaller implements PluginInstallerInterface
         return 'Wishlist plugin for Sylius';
     }
 
-    public function package(): ?string
+    public function package(): string
     {
-        return null;
+        return 'sylius/wishlist-plugin';
     }
 
     public function __invoke(App $app): void
@@ -36,6 +35,7 @@ final readonly class WishlistInstaller implements PluginInstallerInterface
         io()->title('Adding Wishlist Plugin');
 
         Composer::allowContribRecipes($app);
+        Docker::run($app, 'composer require sylius/wishlist-plugin');
         Docker::run($app, 'bin/console assets:install public');
         Docker::run($app, 'yarn install');
         Assets::build($app);
