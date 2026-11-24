@@ -93,6 +93,33 @@ final class PluginTasks
         return ComponentChoices::build($components);
     }
 
+    /**
+     * @return list<string> the plugins sylius:plugin:add can install
+     */
+    public static function installerNames(): array
+    {
+        return array_keys(self::$installers);
+    }
+
+    /**
+     * @return array<string, string> the description of each plugin sylius:plugin:add can install
+     */
+    public static function descriptions(): array
+    {
+        $descriptions = array_map(static fn(InstallerInterface $installer): string => (string) $installer->description(), self::$installers);
+        ksort($descriptions);
+
+        return $descriptions;
+    }
+
+    /**
+     * @return list<string> the plugins sylius:plugin:remove can remove
+     */
+    public static function removerNames(): array
+    {
+        return array_keys(self::$removers);
+    }
+
     public static function addInstaller(InstallerInterface $installer): void
     {
         self::$installers[$installer->name()] = $installer;

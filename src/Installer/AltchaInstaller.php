@@ -35,8 +35,11 @@ final readonly class AltchaInstaller implements InstallerInterface
         Composer::allowContribRecipes($app);
         Docker::run($app, 'composer require tito10047/altcha-bundle');
 
-        // Override the recipe config: Sylius ships StimulusBundle with Webpack Encore, but the bundle
-        // Stimulus controller is not registered in assets/controllers.json, so we load the widget script directly.
+        // Override the recipe config: we load the widget script directly instead of the bundle Stimulus controller.
+        // Since 3.x, Flex enables that controller in assets/controllers.json, and it imports the "altcha" npm package,
+        // which nothing installs: every later asset build (a theme setup...) would fail. Keep it disabled.
+        Symfony::addJsController($app, '@tito10047/altcha-bundle', 'altcha', ['enabled' => false, 'fetch' => 'eager']);
+
         fs()->dumpFile(
             $app->directory() . '/config/packages/altcha.yaml',
             <<<'YAML'
