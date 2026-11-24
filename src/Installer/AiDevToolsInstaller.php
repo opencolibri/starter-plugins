@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace OpenColibri\Starter\Plugins\Installer;
 
 use OpenColibri\Starter\Core\App;
-use OpenColibri\Starter\Core\Component\InstallerInterface;
 use OpenColibri\Starter\Core\Util\Composer;
 use OpenColibri\Starter\Core\Util\Docker;
 
 use function Castor\io;
 
-final readonly class AiDevToolsInstaller implements InstallerInterface
+final readonly class AiDevToolsInstaller implements PluginInstallerInterface
 {
     public function name(): string
     {
@@ -21,6 +20,11 @@ final readonly class AiDevToolsInstaller implements InstallerInterface
     public function description(): string
     {
         return 'Dev-only AI tooling for Sylius';
+    }
+
+    public function package(): string
+    {
+        return 'sylius/sylius-ai-dev-tools';
     }
 
     public function __invoke(App $app): void

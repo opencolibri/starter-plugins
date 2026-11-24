@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenColibri\Starter\Plugins\Installer;
 
 use OpenColibri\Starter\Core\App;
-use OpenColibri\Starter\Core\Component\InstallerInterface;
 use OpenColibri\Starter\Core\Util\Composer;
 use OpenColibri\Starter\Core\Util\Docker;
 use OpenColibri\Starter\Core\Util\Symfony;
@@ -14,7 +13,7 @@ use OpenColibri\Starter\Plugins\Attribute\AsPluginInstaller;
 use function Castor\fs;
 use function Castor\io;
 
-final readonly class BugSnagInstaller implements InstallerInterface
+final readonly class BugSnagInstaller implements PluginInstallerInterface
 {
     public function name(): string
     {
@@ -24,6 +23,11 @@ final readonly class BugSnagInstaller implements InstallerInterface
     public function description(): string
     {
         return 'Official BugSnag notifier for Symfony applications';
+    }
+
+    public function package(): string
+    {
+        return 'bugsnag/bugsnag-symfony';
     }
 
     public function __invoke(App $app): void

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenColibri\Starter\Plugins\Installer;
 
 use OpenColibri\Starter\Core\App;
-use OpenColibri\Starter\Core\Component\InstallerInterface;
 use OpenColibri\Starter\Core\Util\Composer;
 use OpenColibri\Starter\Core\Util\Docker;
 use OpenColibri\Starter\Core\Util\Symfony;
@@ -14,7 +13,7 @@ use OpenColibri\Starter\Plugins\PluginResourceCopier;
 
 use function Castor\io;
 
-final readonly class RecaptchaInstaller implements InstallerInterface
+final readonly class RecaptchaInstaller implements PluginInstallerInterface
 {
     public function name(): string
     {
@@ -24,6 +23,11 @@ final readonly class RecaptchaInstaller implements InstallerInterface
     public function description(): string
     {
         return 'Add Google reCAPTCHA v3 to customer registration';
+    }
+
+    public function package(): string
+    {
+        return 'karser/karser-recaptcha3-bundle';
     }
 
     public function __invoke(App $app): void

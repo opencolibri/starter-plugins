@@ -10,8 +10,10 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use OpenColibri\Starter\Core\Component\CallableInstaller;
 use OpenColibri\Starter\Core\Component\CallableRemover;
+use OpenColibri\Starter\Plugins\Installer\CallablePluginInstaller;
 use OpenColibri\Starter\Plugins\Installer\CmsInstaller;
 use OpenColibri\Starter\Plugins\Installer\ProductBundleInstaller;
+use OpenColibri\Starter\Plugins\Installer\WishlistInstaller;
 use OpenColibri\Starter\Plugins\Remover\ApiRemover;
 use OpenColibri\Starter\Plugins\Tasks\PluginTasks;
 use Symfony\Component\Console\Exception\MissingInputException;
@@ -103,6 +105,18 @@ final class PluginTasksTest extends TestCase
         static::assertSame([
             'api' => 'api - Sylius API and its test tooling',
         ], PluginTasks::choices((new \ReflectionProperty(PluginTasks::class, 'removers'))->getValue()));
+    }
+
+    public function testItListsTheComposerPackageOfEachPluginThatRequiresOne(): void
+    {
+        PluginTasks::addInstaller(new WishlistInstaller());
+        PluginTasks::addInstaller(new CallablePluginInstaller('acme_loyalty', static fn(): null => null, 'Acme loyalty', 'acme/sylius-loyalty-plugin'));
+        PluginTasks::addInstaller(new CmsInstaller());
+
+        static::assertSame([
+            'acme_loyalty' => 'acme/sylius-loyalty-plugin',
+            'cms' => 'sylius/cms-plugin',
+        ], PluginTasks::packages());
     }
 
     public function testItAsksForAChoiceWithDescriptionsWhenNoPluginIsGiven(): void

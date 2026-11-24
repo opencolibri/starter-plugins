@@ -7,7 +7,6 @@ namespace OpenColibri\Starter\Plugins;
 use Castor\Attribute\AsListener;
 use Castor\Event\AfterBootEvent;
 use OpenColibri\Starter\Core\App;
-use OpenColibri\Starter\Core\Component\CallableInstaller;
 use OpenColibri\Starter\Core\Component\CallableRemover;
 use OpenColibri\Starter\Core\Component\ComponentResolver;
 use OpenColibri\Starter\Core\Service\SyliusService;
@@ -21,6 +20,7 @@ use OpenColibri\Starter\Plugins\Installer\CmsInstaller;
 use OpenColibri\Starter\Plugins\Installer\GdprInstaller;
 use OpenColibri\Starter\Plugins\Installer\InvoicingInstaller;
 use OpenColibri\Starter\Plugins\Installer\MediaInstaller;
+use OpenColibri\Starter\Plugins\Installer\CallablePluginInstaller;
 use OpenColibri\Starter\Plugins\Installer\PluginInstallerDescriptor;
 use OpenColibri\Starter\Plugins\Installer\ProductBundleInstaller;
 use OpenColibri\Starter\Plugins\Installer\RecaptchaInstaller;
@@ -73,7 +73,7 @@ function initialize(AfterBootEvent $afterBootEvent): void
 
         if (null !== $descriptor) {
             PluginTasks::addInstaller($descriptor->installer instanceof \ReflectionFunction
-                ? new CallableInstaller($descriptor->attribute->name, $descriptor->installer->getClosure(), $descriptor->attribute->description)
+                ? new CallablePluginInstaller($descriptor->attribute->name, $descriptor->installer->getClosure(), $descriptor->attribute->description, $descriptor->attribute->package)
                 : $descriptor->installer);
         }
 
@@ -101,7 +101,7 @@ function resolve_plugin_installer(\ReflectionFunction|\ReflectionClass $reflecti
         return new PluginInstallerDescriptor($attribute, $installer);
     }
 
-    return new PluginInstallerDescriptor($attribute, new CallableInstaller($attribute->name, static fn(App $app) => $installer($app), $attribute->description));
+    return new PluginInstallerDescriptor($attribute, new CallablePluginInstaller($attribute->name, static fn(App $app) => $installer($app), $attribute->description, $attribute->package));
 }
 
 function resolve_plugin_remover(\ReflectionFunction|\ReflectionClass $reflection): ?PluginRemoverDescriptor

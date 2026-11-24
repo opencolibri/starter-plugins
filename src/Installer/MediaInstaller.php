@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenColibri\Starter\Plugins\Installer;
 
 use OpenColibri\Starter\Core\App;
-use OpenColibri\Starter\Core\Component\InstallerInterface;
 use OpenColibri\Starter\Core\PhpFile;
 use OpenColibri\Starter\Core\Util\Assets;
 use OpenColibri\Starter\Core\Util\Composer;
@@ -18,7 +17,7 @@ use OpenColibri\Starter\Core\Util\Yaml;
 use function Castor\fs;
 use function Castor\io;
 
-final readonly class MediaInstaller implements InstallerInterface
+final readonly class MediaInstaller implements PluginInstallerInterface
 {
     public function name(): string
     {
@@ -28,6 +27,11 @@ final readonly class MediaInstaller implements InstallerInterface
     public function description(): string
     {
         return 'Media management bundle for Symfony applications';
+    }
+
+    public function package(): string
+    {
+        return 'jolicode/media-bundle';
     }
 
     public function __invoke(App $app): void

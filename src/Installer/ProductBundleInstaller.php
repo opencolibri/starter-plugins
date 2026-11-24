@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenColibri\Starter\Plugins\Installer;
 
 use OpenColibri\Starter\Core\App;
-use OpenColibri\Starter\Core\Component\InstallerInterface;
 use OpenColibri\Starter\Core\PhpFile;
 use OpenColibri\Starter\Core\Util\Assets;
 use OpenColibri\Starter\Core\Util\Composer;
@@ -15,7 +14,7 @@ use OpenColibri\Starter\Core\Util\Symfony;
 
 use function Castor\io;
 
-final readonly class ProductBundleInstaller implements InstallerInterface
+final readonly class ProductBundleInstaller implements PluginInstallerInterface
 {
     public function name(): string
     {
@@ -25,6 +24,11 @@ final readonly class ProductBundleInstaller implements InstallerInterface
     public function description(): string
     {
         return 'Product bundle for Sylius';
+    }
+
+    public function package(): string
+    {
+        return 'sylius/product-bundle-plugin';
     }
 
     public function __invoke(App $app): void

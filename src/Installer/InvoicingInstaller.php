@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenColibri\Starter\Plugins\Installer;
 
 use OpenColibri\Starter\Core\App;
-use OpenColibri\Starter\Core\Component\InstallerInterface;
 use OpenColibri\Starter\Core\Util\Composer;
 use OpenColibri\Starter\Core\Util\Database;
 use OpenColibri\Starter\Core\Util\Docker;
@@ -14,7 +13,7 @@ use OpenColibri\Starter\Core\Util\Symfony;
 use function Castor\fs;
 use function Castor\io;
 
-final readonly class InvoicingInstaller implements InstallerInterface
+final readonly class InvoicingInstaller implements PluginInstallerInterface
 {
     public function name(): string
     {
@@ -24,6 +23,11 @@ final readonly class InvoicingInstaller implements InstallerInterface
     public function description(): string
     {
         return 'Invoicing plugin for Sylius';
+    }
+
+    public function package(): string
+    {
+        return 'sylius/invoicing-plugin';
     }
 
     public function __invoke(App $app): void

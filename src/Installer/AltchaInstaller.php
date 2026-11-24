@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenColibri\Starter\Plugins\Installer;
 
 use OpenColibri\Starter\Core\App;
-use OpenColibri\Starter\Core\Component\InstallerInterface;
 use OpenColibri\Starter\Core\Util\Composer;
 use OpenColibri\Starter\Core\Util\Docker;
 use OpenColibri\Starter\Core\Util\Symfony;
@@ -15,7 +14,7 @@ use OpenColibri\Starter\Plugins\PluginResourceCopier;
 use function Castor\fs;
 use function Castor\io;
 
-final readonly class AltchaInstaller implements InstallerInterface
+final readonly class AltchaInstaller implements PluginInstallerInterface
 {
     public function name(): string
     {
@@ -25,6 +24,11 @@ final readonly class AltchaInstaller implements InstallerInterface
     public function description(): string
     {
         return 'Add ALTCHA (self-hosted, privacy-friendly captcha) to customer registration';
+    }
+
+    public function package(): string
+    {
+        return 'tito10047/altcha-bundle';
     }
 
     public function __invoke(App $app): void

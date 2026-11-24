@@ -10,5 +10,7 @@ class AsPluginInstaller
     public function __construct(
         public string $name,
         public ?string $description = null,
+        /** The Composer package the plugin requires, to tell from composer.json whether it is installed (dev-kit). */
+        public ?string $package = null,
     ) {}
 }

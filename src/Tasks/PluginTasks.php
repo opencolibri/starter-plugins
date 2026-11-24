@@ -10,11 +10,13 @@ use OpenColibri\Starter\Core\App;
 use OpenColibri\Starter\Core\Component\ComponentChoices;
 use OpenColibri\Starter\Core\Component\InstallerInterface;
 use OpenColibri\Starter\Core\Component\RemoverInterface;
+use OpenColibri\Starter\Plugins\Installer\PluginInstallerInterface;
 
 use function Castor\io;
 
 final class PluginTasks
 {
+    /** @var array<string, PluginInstallerInterface> */
     private static array $installers = [];
 
     private static array $removers = [];
@@ -106,7 +108,7 @@ final class PluginTasks
      */
     public static function descriptions(): array
     {
-        $descriptions = array_map(static fn(InstallerInterface $installer): string => (string) $installer->description(), self::$installers);
+        $descriptions = array_map(static fn(PluginInstallerInterface $installer): string => (string) $installer->description(), self::$installers);
         ksort($descriptions);
 
         return $descriptions;
@@ -120,7 +122,18 @@ final class PluginTasks
         return array_keys(self::$removers);
     }
 
-    public static function addInstaller(InstallerInterface $installer): void
+    /**
+     * @return array<string, string> the Composer package of each plugin that requires one
+     */
+    public static function packages(): array
+    {
+        $packages = array_filter(array_map(static fn(PluginInstallerInterface $installer): ?string => $installer->package(), self::$installers));
+        ksort($packages);
+
+        return $packages;
+    }
+
+    public static function addInstaller(PluginInstallerInterface $installer): void
     {
         self::$installers[$installer->name()] = $installer;
     }
