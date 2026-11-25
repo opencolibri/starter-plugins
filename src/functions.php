@@ -9,6 +9,7 @@ use Castor\Event\AfterBootEvent;
 use OpenColibri\Starter\Core\App;
 use OpenColibri\Starter\Core\Component\CallableRemover;
 use OpenColibri\Starter\Core\Component\ComponentResolver;
+use OpenColibri\Starter\Core\Installer\SyliusInstallerExtensions;
 use OpenColibri\Starter\Core\Service\SyliusService;
 use OpenColibri\Starter\Core\Task\TaskProviderRegistry;
 use OpenColibri\Starter\Plugins\Attribute\AsPluginInstaller;
@@ -20,11 +21,15 @@ use OpenColibri\Starter\Plugins\Installer\CmsInstaller;
 use OpenColibri\Starter\Plugins\Installer\GdprInstaller;
 use OpenColibri\Starter\Plugins\Installer\InvoicingInstaller;
 use OpenColibri\Starter\Plugins\Installer\MediaInstaller;
+use OpenColibri\Starter\Plugins\Installer\MollieInstaller;
+use OpenColibri\Starter\Plugins\Installer\PaymentGatewaysSyliusInstallerExtension;
+use OpenColibri\Starter\Plugins\Installer\PaypalInstaller;
 use OpenColibri\Starter\Plugins\Installer\CallablePluginInstaller;
 use OpenColibri\Starter\Plugins\Installer\PluginInstallerDescriptor;
 use OpenColibri\Starter\Plugins\Installer\ProductBundleInstaller;
 use OpenColibri\Starter\Plugins\Installer\RecaptchaInstaller;
 use OpenColibri\Starter\Plugins\Installer\RefundInstaller;
+use OpenColibri\Starter\Plugins\Installer\StripeInstaller;
 use OpenColibri\Starter\Plugins\Installer\TwoFactorAuthInstaller;
 use OpenColibri\Starter\Plugins\Installer\WishlistInstaller;
 use OpenColibri\Starter\Plugins\Remover\AiDevToolsRemover;
@@ -34,8 +39,11 @@ use OpenColibri\Starter\Plugins\Remover\BugSnagRemover;
 use OpenColibri\Starter\Plugins\Remover\CmsRemover;
 use OpenColibri\Starter\Plugins\Remover\GdprRemover;
 use OpenColibri\Starter\Plugins\Remover\InvoicingRemover;
+use OpenColibri\Starter\Plugins\Remover\MollieRemover;
+use OpenColibri\Starter\Plugins\Remover\PaypalRemover;
 use OpenColibri\Starter\Plugins\Remover\PluginRemoverDescriptor;
 use OpenColibri\Starter\Plugins\Remover\RecaptchaRemover;
+use OpenColibri\Starter\Plugins\Remover\StripeRemover;
 use OpenColibri\Starter\Plugins\Remover\TwoFactorAuthRemover;
 use OpenColibri\Starter\Plugins\Remover\WishlistRemover;
 use OpenColibri\Starter\Plugins\Tasks\PluginTasks;
@@ -44,6 +52,8 @@ TaskProviderRegistry::register(
     'plugins',
     static fn(SyliusService $service): iterable => (new PluginTasks($service->getName(), $service->getDirectory()))(),
 );
+
+SyliusInstallerExtensions::register('payment_gateways', new PaymentGatewaysSyliusInstallerExtension());
 
 #[AsListener(AfterBootEvent::class)]
 function initialize(AfterBootEvent $afterBootEvent): void
@@ -55,9 +65,12 @@ function initialize(AfterBootEvent $afterBootEvent): void
     PluginTasks::addInstaller(new GdprInstaller());
     PluginTasks::addInstaller(new InvoicingInstaller());
     PluginTasks::addInstaller(new MediaInstaller());
+    PluginTasks::addInstaller(new MollieInstaller());
+    PluginTasks::addInstaller(new PaypalInstaller());
     PluginTasks::addInstaller(new ProductBundleInstaller());
     PluginTasks::addInstaller(new RecaptchaInstaller());
     PluginTasks::addInstaller(new RefundInstaller());
+    PluginTasks::addInstaller(new StripeInstaller());
     PluginTasks::addInstaller(new TwoFactorAuthInstaller());
     PluginTasks::addInstaller(new WishlistInstaller());
 
@@ -68,7 +81,10 @@ function initialize(AfterBootEvent $afterBootEvent): void
     PluginTasks::addRemover(new CmsRemover());
     PluginTasks::addRemover(new GdprRemover());
     PluginTasks::addRemover(new InvoicingRemover());
+    PluginTasks::addRemover(new MollieRemover());
+    PluginTasks::addRemover(new PaypalRemover());
     PluginTasks::addRemover(new RecaptchaRemover());
+    PluginTasks::addRemover(new StripeRemover());
     PluginTasks::addRemover(new TwoFactorAuthRemover());
     PluginTasks::addRemover(new WishlistRemover());
 
@@ -77,7 +93,7 @@ function initialize(AfterBootEvent $afterBootEvent): void
 
         if (null !== $descriptor) {
             PluginTasks::addInstaller($descriptor->installer instanceof \ReflectionFunction
-                ? new CallablePluginInstaller($descriptor->attribute->name, $descriptor->installer->getClosure(), $descriptor->attribute->description, $descriptor->attribute->package)
+                ? new CallablePluginInstaller($descriptor->attribute->name, $descriptor->installer->getClosure(), $descriptor->attribute->description, $descriptor->attribute->package, $descriptor->attribute->group)
                 : $descriptor->installer);
         }
 
@@ -105,7 +121,7 @@ function resolve_plugin_installer(\ReflectionFunction|\ReflectionClass $reflecti
         return new PluginInstallerDescriptor($attribute, $installer);
     }
 
-    return new PluginInstallerDescriptor($attribute, new CallablePluginInstaller($attribute->name, static fn(App $app) => $installer($app), $attribute->description, $attribute->package));
+    return new PluginInstallerDescriptor($attribute, new CallablePluginInstaller($attribute->name, static fn(App $app) => $installer($app), $attribute->description, $attribute->package, $attribute->group));
 }
 
 function resolve_plugin_remover(\ReflectionFunction|\ReflectionClass $reflection): ?PluginRemoverDescriptor

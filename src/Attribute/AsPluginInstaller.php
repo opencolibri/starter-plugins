@@ -12,5 +12,7 @@ class AsPluginInstaller
         public ?string $description = null,
         /** The Composer package the plugin requires, to tell from composer.json whether it is installed (dev-kit). */
         public ?string $package = null,
+        /** The family of the plugin, such as GroupedPluginInstallerInterface::PAYMENT for a payment gateway. */
+        public ?string $group = null,
     ) {}
 }

@@ -9,13 +9,14 @@ use OpenColibri\Starter\Core\App;
 /**
  * A plugin installer declared with #[AsPluginInstaller].
  */
-final readonly class CallablePluginInstaller implements PluginInstallerInterface
+final readonly class CallablePluginInstaller implements GroupedPluginInstallerInterface
 {
     public function __construct(
         public string $name,
         public \Closure $code,
         public ?string $description = null,
         public ?string $package = null,
+        public ?string $group = null,
     ) {}
 
     public function name(): string
@@ -31,6 +32,11 @@ final readonly class CallablePluginInstaller implements PluginInstallerInterface
     public function package(): ?string
     {
         return $this->package;
+    }
+
+    public function group(): ?string
+    {
+        return $this->group;
     }
 
     public function __invoke(App $app): void

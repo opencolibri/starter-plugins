@@ -1,6 +1,6 @@
 {
     "name": "opencolibri/starter-plugins",
-    "description": "Castor tasks to add and remove Sylius plugins (CMS, Invoicing, Refund, Wishlist, reCAPTCHA, ALTCHA, 2FA...)",
+    "description": "Castor tasks to add and remove Sylius plugins (CMS, Invoicing, Refund, Wishlist, reCAPTCHA, ALTCHA, 2FA, Stripe, Mollie, PayPal...)",
     "type": "library",
     "license": "MIT",
     "keywords": [
@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": ">=8.3",
-        "opencolibri/starter-core": "self.version"
+        "opencolibri/starter-core": "self.version",
+        "castor-php/docker": "^0.11"
     },
     "autoload": {
         "psr-4": {

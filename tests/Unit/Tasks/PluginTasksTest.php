@@ -12,6 +12,10 @@ use OpenColibri\Starter\Core\Component\CallableInstaller;
 use OpenColibri\Starter\Core\Component\CallableRemover;
 use OpenColibri\Starter\Plugins\Installer\CallablePluginInstaller;
 use OpenColibri\Starter\Plugins\Installer\CmsInstaller;
+use OpenColibri\Starter\Plugins\Installer\GroupedPluginInstallerInterface;
+use OpenColibri\Starter\Plugins\Installer\MollieInstaller;
+use OpenColibri\Starter\Plugins\Installer\PaypalInstaller;
+use OpenColibri\Starter\Plugins\Installer\StripeInstaller;
 use OpenColibri\Starter\Plugins\Installer\ProductBundleInstaller;
 use OpenColibri\Starter\Plugins\Installer\WishlistInstaller;
 use OpenColibri\Starter\Plugins\Remover\ApiRemover;
@@ -166,5 +170,125 @@ final class PluginTasksTest extends TestCase
         $this->expectException(MissingInputException::class);
 
         $tasks[1]['function']([]);
+    }
+
+    public function testItListsThePluginsOfAGroup(): void
+    {
+        PluginTasks::addInstaller(new StripeInstaller());
+        PluginTasks::addInstaller(new CmsInstaller());
+        PluginTasks::addInstaller(new PaypalInstaller());
+        PluginTasks::addInstaller(new MollieInstaller());
+        PluginTasks::addInstaller(new CallablePluginInstaller('acme_pay', static fn(): null => null, 'Acme Pay', 'acme/sylius-pay-plugin', GroupedPluginInstallerInterface::PAYMENT));
+
+        static::assertSame(['acme_pay', 'mollie', 'paypal', 'stripe'], PluginTasks::group(GroupedPluginInstallerInterface::PAYMENT));
+        static::assertSame([], PluginTasks::group('unknown'));
+    }
+
+    public function testItTellsTheInstalledPluginsFromComposerJson(): void
+    {
+        PluginTasks::addInstaller(new StripeInstaller());
+        PluginTasks::addInstaller(new MollieInstaller());
+        PluginTasks::addInstaller(new CmsInstaller());
+        $this->writeComposerJson(['flux-se/sylius-stripe-plugin', 'sylius/cms-plugin']);
+
+        static::assertSame(['cms', 'stripe'], PluginTasks::installed($this->tempDir));
+        static::assertSame([], PluginTasks::installed($this->tempDir . '/missing'));
+    }
+
+    public function testItPreChecksTheInstalledPluginsAndRemovesOnlyTheUncheckedOnesOnceConfirmed(): void
+    {
+        $calls = [];
+        $this->registerPlugin('stripe', 'flux-se/sylius-stripe-plugin', $calls);
+        $this->registerPlugin('mollie', 'sylius/mollie-plugin', $calls);
+        $this->registerPlugin('paypal', 'sylius/paypal-plugin', $calls);
+        $this->writeComposerJson(['flux-se/sylius-stripe-plugin', 'sylius/mollie-plugin']);
+
+        $io = $this->createMock(SymfonyStyle::class);
+        $io->expects($this->once())
+            ->method('choice')
+            ->with(
+                'Which plugins would you like to have? The installed ones are checked, uncheck one to remove it.',
+                static::anything(),
+                'mollie,stripe',
+                true,
+            )
+            // Keeps stripe, unchecks mollie, checks paypal.
+            ->willReturn(['paypal', 'stripe'])
+        ;
+        $io->expects($this->once())
+            ->method('confirm')
+            ->with('Remove the unchecked plugins (mollie)? Their data is dropped.', false)
+            ->willReturn(true)
+        ;
+        $this->setUpContainer($io);
+
+        $tasks = iterator_to_array((new PluginTasks('test-app', $this->tempDir))());
+        $tasks[0]['function']([]);
+
+        static::assertSame(['remove mollie', 'install paypal'], $calls);
+    }
+
+    public function testItKeepsTheUncheckedPluginsWhenTheRemovalIsDeclined(): void
+    {
+        $calls = [];
+        $this->registerPlugin('stripe', 'flux-se/sylius-stripe-plugin', $calls);
+        $this->registerPlugin('paypal', 'sylius/paypal-plugin', $calls);
+        $this->writeComposerJson(['flux-se/sylius-stripe-plugin']);
+
+        $io = static::createStub(SymfonyStyle::class);
+        $io->method('choice')->willReturn(['paypal']);
+        $io->method('confirm')->willReturn(false);
+        $this->setUpContainer($io);
+
+        $tasks = iterator_to_array((new PluginTasks('test-app', $this->tempDir))());
+        $tasks[0]['function']([]);
+
+        static::assertSame(['install paypal'], $calls);
+    }
+
+    public function testItNeverRemovesAPluginGivenOnTheCommandLine(): void
+    {
+        $calls = [];
+        $this->registerPlugin('stripe', 'flux-se/sylius-stripe-plugin', $calls);
+        $this->registerPlugin('paypal', 'sylius/paypal-plugin', $calls);
+        $this->writeComposerJson(['flux-se/sylius-stripe-plugin']);
+
+        $io = $this->createMock(SymfonyStyle::class);
+        $io->expects($this->never())->method('choice');
+        $io->expects($this->never())->method('confirm');
+        $this->setUpContainer($io);
+
+        $tasks = iterator_to_array((new PluginTasks('test-app', $this->tempDir))());
+        $tasks[0]['function'](['paypal']);
+
+        static::assertSame(['install paypal'], $calls);
+    }
+
+    /**
+     * @param list<string> $calls
+     */
+    private function registerPlugin(string $name, string $package, array &$calls): void
+    {
+        PluginTasks::addInstaller(new CallablePluginInstaller($name, static function () use ($name, &$calls): void {
+            $calls[] = 'install ' . $name;
+        }, null, $package, GroupedPluginInstallerInterface::PAYMENT));
+        PluginTasks::addRemover(new CallableRemover($name, static function () use ($name, &$calls): void {
+            $calls[] = 'remove ' . $name;
+        }));
+    }
+
+    /**
+     * @param list<string> $packages
+     */
+    private function writeComposerJson(array $packages): void
+    {
+        @mkdir($this->tempDir, 0o777, true);
+        file_put_contents($this->tempDir . '/composer.json', json_encode(['require' => array_fill_keys($packages, '*')], \JSON_THROW_ON_ERROR));
+    }
+
+    protected function tearDown(): void
+    {
+        @unlink($this->tempDir . '/composer.json');
+        @rmdir($this->tempDir);
     }
 }
