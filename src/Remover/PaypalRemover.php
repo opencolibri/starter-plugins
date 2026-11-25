@@ -6,9 +6,11 @@ namespace OpenColibri\Starter\Plugins\Remover;
 
 use OpenColibri\Starter\Core\App;
 use OpenColibri\Starter\Core\Component\RemoverInterface;
+use OpenColibri\Starter\Core\Util\Assets;
 use OpenColibri\Starter\Core\Util\Composer;
 use OpenColibri\Starter\Core\Util\Database;
 use OpenColibri\Starter\Core\Util\Docker;
+use OpenColibri\Starter\Core\Util\Javascript;
 use OpenColibri\Starter\Core\Util\Symfony;
 
 use function Castor\io;
@@ -31,7 +33,12 @@ final readonly class PaypalRemover implements RemoverInterface
 
         Composer::allowContribRecipes($app);
         Database::rollbackPluginMigrations($app, 'Sylius\PayPalPlugin\Migrations');
+        // Sylius-Standard 2.3+ imports the plugin assets in its entrypoints, which Encore would no longer find.
+        Javascript::removeVendorImports($app, 'sylius/paypal-plugin');
         Docker::run($app, 'composer remove sylius/paypal-plugin');
+        // Flex drops the plugin Stimulus controllers from package.json: the node modules and the build follow.
+        Docker::run($app, 'yarn install');
+        Assets::build($app);
         Symfony::cacheClear($app);
     }
 }

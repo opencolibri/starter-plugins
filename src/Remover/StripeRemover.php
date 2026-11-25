@@ -9,6 +9,7 @@ use OpenColibri\Starter\Core\Component\RemoverInterface;
 use OpenColibri\Starter\Core\Util\Assets;
 use OpenColibri\Starter\Core\Util\Composer;
 use OpenColibri\Starter\Core\Util\Docker;
+use OpenColibri\Starter\Core\Util\Javascript;
 use OpenColibri\Starter\Core\Util\Symfony;
 
 use function Castor\io;
@@ -30,6 +31,8 @@ final readonly class StripeRemover implements RemoverInterface
         io()->title('Removing Stripe plugin');
 
         Composer::allowContribRecipes($app);
+        // Sylius-Standard 2.3+ imports the plugin assets in its entrypoints, which Encore would no longer find.
+        Javascript::removeVendorImports($app, 'flux-se/sylius-stripe-plugin');
         Docker::run($app, 'composer remove flux-se/sylius-stripe-plugin');
         Docker::run($app, 'yarn install');
         Assets::build($app);

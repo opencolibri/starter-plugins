@@ -7,9 +7,11 @@ namespace OpenColibri\Starter\Plugins\Remover;
 use OpenColibri\Starter\Core\App;
 use OpenColibri\Starter\Core\Component\RemoverInterface;
 use OpenColibri\Starter\Core\PhpFile;
+use OpenColibri\Starter\Core\Util\Assets;
 use OpenColibri\Starter\Core\Util\Composer;
 use OpenColibri\Starter\Core\Util\Database;
 use OpenColibri\Starter\Core\Util\Docker;
+use OpenColibri\Starter\Core\Util\Javascript;
 use OpenColibri\Starter\Core\Util\Symfony;
 use OpenColibri\Starter\Plugins\Installer\MollieInstaller;
 
@@ -53,9 +55,13 @@ final readonly class MollieRemover implements RemoverInterface
             $file->removeInterface($interface)->save();
         }
 
+        // Sylius-Standard 2.3+ imports the plugin assets in its entrypoints, which Encore would no longer find.
+        Javascript::removeVendorImports($app, 'sylius/mollie-plugin');
+
         // The cache still maps the plugin Doctrine types: the Composer scripts would fail to boot it, clear it instead.
         Docker::run($app, 'composer remove sylius/mollie-plugin --no-scripts');
         Symfony::cacheClear($app);
         Docker::run($app, 'bin/console assets:install public');
+        Assets::build($app);
     }
 }
