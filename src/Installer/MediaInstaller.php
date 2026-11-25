@@ -10,9 +10,9 @@ use OpenColibri\Starter\Core\Util\Assets;
 use OpenColibri\Starter\Core\Util\Composer;
 use OpenColibri\Starter\Core\Util\Database;
 use OpenColibri\Starter\Core\Util\Docker;
-use OpenColibri\Starter\Core\Util\Filesystem;
 use OpenColibri\Starter\Core\Util\Symfony;
 use OpenColibri\Starter\Core\Util\Yaml;
+use OpenColibri\Starter\Plugins\PluginResourceCopier;
 
 use function Castor\fs;
 use function Castor\io;
@@ -116,56 +116,18 @@ final readonly class MediaInstaller implements PluginInstallerInterface
 
         $this->createMediaLibraryMenu($app);
 
-        $baseDir = $app->directory();
+        foreach (['Product/ProductImage', 'Taxonomy/TaxonImage', 'User/AvatarImage'] as $entity) {
+            (new PhpFile($app->directory() . '/src/Entity/' . $entity . '.php'))
+                ->addTrait(\JoliCode\MediaBundle\Bridge\Sylius\Doctrine\ORM\EntityWithMediaImageTrait::class) // @phpstan-ignore class.notFound
+                ->save()
+            ;
+        }
 
-        (new PhpFile($baseDir . '/src/Entity/Product/ProductImage.php'))
-            ->addTrait(\JoliCode\MediaBundle\Bridge\Sylius\Doctrine\ORM\EntityWithMediaImageTrait::class) // @phpstan-ignore class.notFound
-            ->save()
-        ;
-
-        (new PhpFile($baseDir . '/src/Entity/Product/TaxonImage.php'))
-            ->addTrait(\JoliCode\MediaBundle\Bridge\Sylius\Doctrine\ORM\EntityWithMediaImageTrait::class) // @phpstan-ignore class.notFound
-            ->save()
-        ;
-
-        (new PhpFile($baseDir . '/src/Entity/Product/AvatarImage.php'))
-            ->addTrait(\JoliCode\MediaBundle\Bridge\Sylius\Doctrine\ORM\EntityWithMediaImageTrait::class) // @phpstan-ignore class.notFound
-            ->save()
-        ;
+        // The migration of the media columns, which points them at the current images.
+        PluginResourceCopier::copy($app, 'media');
 
         Symfony::cacheClear($app);
-
-        // Ensure all current migrations have been executed.
         Database::migrate($app);
-
-        Database::diff($app);
-
-        $latestMigration = Filesystem::latestFile($app, 'migrations');
-
-        if (null === $latestMigration) {
-            io()->error('No lastest migration found.');
-        }
-
-        (new PhpFile($baseDir . '/migrations/' . $latestMigration))
-            ->appendToMethod(
-                'up',
-                <<<'PHP'
-                    // These lines synchronize the media with the current path.
-                    $this->addSql('UPDATE sylius_avatar_image SET media = path');
-                    $this->addSql('UPDATE sylius_product_image SET media = path');
-                    $this->addSql('UPDATE sylius_taxon_image SET media = path');
-                    PHP,
-            )
-            ->save()
-        ;
-
-        if (io()->confirm(\sprintf('We have created the "%s" migration file, do you want to execute it now?', $latestMigration))) {
-            Database::migrate($app);
-        } else {
-            io()->caution('Do not forget to sync your database.');
-        }
-
-        Symfony::cacheClear($app);
         Assets::install($app);
     }
 

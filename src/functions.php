@@ -25,6 +25,7 @@ use OpenColibri\Starter\Plugins\Installer\PluginInstallerDescriptor;
 use OpenColibri\Starter\Plugins\Installer\ProductBundleInstaller;
 use OpenColibri\Starter\Plugins\Installer\RecaptchaInstaller;
 use OpenColibri\Starter\Plugins\Installer\RefundInstaller;
+use OpenColibri\Starter\Plugins\Installer\TwoFactorAuthInstaller;
 use OpenColibri\Starter\Plugins\Installer\WishlistInstaller;
 use OpenColibri\Starter\Plugins\Remover\AiDevToolsRemover;
 use OpenColibri\Starter\Plugins\Remover\AltchaRemover;
@@ -35,6 +36,7 @@ use OpenColibri\Starter\Plugins\Remover\GdprRemover;
 use OpenColibri\Starter\Plugins\Remover\InvoicingRemover;
 use OpenColibri\Starter\Plugins\Remover\PluginRemoverDescriptor;
 use OpenColibri\Starter\Plugins\Remover\RecaptchaRemover;
+use OpenColibri\Starter\Plugins\Remover\TwoFactorAuthRemover;
 use OpenColibri\Starter\Plugins\Remover\WishlistRemover;
 use OpenColibri\Starter\Plugins\Tasks\PluginTasks;
 
@@ -56,6 +58,7 @@ function initialize(AfterBootEvent $afterBootEvent): void
     PluginTasks::addInstaller(new ProductBundleInstaller());
     PluginTasks::addInstaller(new RecaptchaInstaller());
     PluginTasks::addInstaller(new RefundInstaller());
+    PluginTasks::addInstaller(new TwoFactorAuthInstaller());
     PluginTasks::addInstaller(new WishlistInstaller());
 
     PluginTasks::addRemover(new AiDevToolsRemover());
@@ -66,6 +69,7 @@ function initialize(AfterBootEvent $afterBootEvent): void
     PluginTasks::addRemover(new GdprRemover());
     PluginTasks::addRemover(new InvoicingRemover());
     PluginTasks::addRemover(new RecaptchaRemover());
+    PluginTasks::addRemover(new TwoFactorAuthRemover());
     PluginTasks::addRemover(new WishlistRemover());
 
     foreach (ComponentResolver::candidates() as $reflection) {

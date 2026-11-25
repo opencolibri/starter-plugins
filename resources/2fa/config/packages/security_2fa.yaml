@@ -1,0 +1,17 @@
+# Loaded right after security.yaml (Symfony sorts the files with strnatcmp): the admin and shop firewalls must exist
+# before this file adds their second factor.
+imports:
+    - { resource: "@BitExpertSyliusTwoFactorAuthPlugin/config/config.yaml" }
+
+security:
+    firewalls:
+        admin:
+            two_factor:
+                auth_form_path: bitexpert_sylius_2fa_admin_login
+                check_path: bitexpert_sylius_2fa_admin_login_check
+                multi_factor: false
+        shop:
+            two_factor:
+                auth_form_path: bitexpert_sylius_2fa_shop_login
+                check_path: bitexpert_sylius_2fa_shop_login_check
+                multi_factor: false
