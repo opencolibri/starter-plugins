@@ -40,6 +40,8 @@ final class PluginTasks
                     self::$installers,
                 );
 
+                $plugins = self::withoutOptions($plugins);
+
                 if ([] === $plugins) {
                     [$plugins, $unchecked] = self::askWantedPlugins($app);
 
@@ -65,6 +67,8 @@ final class PluginTasks
                     self::$removers,
                 );
 
+                $plugins = self::withoutOptions($plugins);
+
                 if ([] === $plugins) {
                     $plugins = io()->choice(
                         'Which plugins would you like to remove?',
@@ -83,6 +87,19 @@ final class PluginTasks
                 }
             },
         ];
+    }
+
+    /**
+     * The raw tokens of sylius:add and sylius:remove hold the global options too ("--no-interaction", "-v"…), which
+     * name no plugin.
+     *
+     * @param list<string> $tokens
+     *
+     * @return list<string>
+     */
+    private static function withoutOptions(array $tokens): array
+    {
+        return array_values(array_filter($tokens, static fn(string $token): bool => !str_starts_with($token, '-')));
     }
 
     /**

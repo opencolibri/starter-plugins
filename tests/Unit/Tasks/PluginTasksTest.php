@@ -264,6 +264,24 @@ final class PluginTasksTest extends TestCase
         static::assertSame(['install paypal'], $calls);
     }
 
+    public function testItSkipsTheOptionsAmongThePluginsToAddAndRemove(): void
+    {
+        $calls = [];
+        $this->registerPlugin('stripe', 'flux-se/sylius-stripe-plugin', $calls);
+        $this->registerPlugin('paypal', 'sylius/paypal-plugin', $calls);
+
+        $io = $this->createMock(SymfonyStyle::class);
+        $io->expects($this->never())->method('choice');
+        $io->expects($this->never())->method('warning');
+        $this->setUpContainer($io);
+
+        $tasks = iterator_to_array((new PluginTasks('test-app', $this->tempDir))());
+        $tasks[0]['function'](['--no-interaction', 'stripe']);
+        $tasks[1]['function'](['-n', 'paypal']);
+
+        static::assertSame(['install stripe', 'remove paypal'], $calls);
+    }
+
     /**
      * @param list<string> $calls
      */
