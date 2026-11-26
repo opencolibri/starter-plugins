@@ -12,13 +12,15 @@ use OpenColibri\Starter\Core\Util\Database;
 use OpenColibri\Starter\Core\Util\Docker;
 use OpenColibri\Starter\Core\Util\Symfony;
 use OpenColibri\Starter\Core\Util\Yaml;
-use OpenColibri\Starter\Plugins\PluginResourceCopier;
 
 use function Castor\fs;
 use function Castor\io;
 
 final readonly class MediaInstaller implements GroupedPluginInstallerInterface
 {
+    /** The image tables the media column is added to. */
+    private const array TABLES = ['sylius_avatar_image', 'sylius_product_image', 'sylius_taxon_image'];
+
     public function name(): string
     {
         return 'media';
@@ -42,6 +44,9 @@ final readonly class MediaInstaller implements GroupedPluginInstallerInterface
     public function __invoke(App $app): void
     {
         io()->title('Adding Media plugin');
+
+        // The mapped schema before the plugin, to generate the migration of the tables it changes.
+        $schema = Database::mappedSchema($app);
 
         Composer::allowContribRecipes($app);
         Docker::run($app, 'composer require jolicode/media-bundle');
@@ -128,10 +133,21 @@ final readonly class MediaInstaller implements GroupedPluginInstallerInterface
             ;
         }
 
-        // The migration of the media columns, which points them at the current images.
-        PluginResourceCopier::copy($app, 'media');
-
         Symfony::cacheClear($app);
+        // The media columns, in a migration generated once the others are run, which points them at the current images.
+        Database::migrate($app);
+        $migration = Database::generatePluginMigration($app, 'Add the media plugin', $schema);
+
+        if (null !== $migration) {
+            (new PhpFile($migration))
+                ->appendToMethod('up', implode("\n", array_map(
+                    static fn(string $table): string => \sprintf("\$this->addSql('UPDATE %s SET media = path');", $table),
+                    self::TABLES,
+                )))
+                ->save()
+            ;
+        }
+
         Database::migrate($app);
         Assets::install($app);
     }

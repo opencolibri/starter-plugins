@@ -8,6 +8,7 @@ use OpenColibri\Starter\Core\App;
 use OpenColibri\Starter\Core\Component\RemoverInterface;
 use OpenColibri\Starter\Core\PhpFile;
 use OpenColibri\Starter\Core\Util\Composer;
+use OpenColibri\Starter\Core\Util\Database;
 use OpenColibri\Starter\Core\Util\Docker;
 use OpenColibri\Starter\Core\Util\Symfony;
 use OpenColibri\Starter\Plugins\Installer\TwoFactorAuthInstaller;
@@ -18,8 +19,6 @@ use function Castor\io;
 
 final readonly class TwoFactorAuthRemover implements RemoverInterface
 {
-    private const string MIGRATION = 'DoctrineMigrations\\Version20261125120000';
-
     public function name(): string
     {
         return '2fa';
@@ -34,14 +33,10 @@ final readonly class TwoFactorAuthRemover implements RemoverInterface
     {
         io()->title('Removing 2FA plugin');
 
+        // The mapped schema before the plugin, to generate the migration of the tables it changes.
+        $schema = Database::mappedSchema($app);
+
         Composer::allowContribRecipes($app);
-
-        // Drop the columns while the migration is still there, then unwire everything before Composer clears the cache.
-        $migrations = Docker::run($app, 'bin/console doctrine:migrations:list --no-interaction --no-ansi')->getOutput();
-
-        if (preg_match(\sprintf('/^\|\s*%s\s+\|\s+migrated\s+\|/m', preg_quote(self::MIGRATION, '/')), $migrations)) {
-            Docker::run($app, \sprintf('bin/console doctrine:migrations:execute --down --no-interaction %s', escapeshellarg(self::MIGRATION)));
-        }
 
         foreach (TwoFactorAuthInstaller::ENTITIES as $entity) {
             (new PhpFile($app->directory() . '/' . $entity))
@@ -66,7 +61,12 @@ final readonly class TwoFactorAuthRemover implements RemoverInterface
         Docker::run($app, 'composer remove bitexpert/sylius-2fa-plugin');
         Docker::run($app, 'composer config --unset allow-plugins.endroid/installer');
 
+        // Drop its tables in a new migration rather than rolling back the plugin ones: the other environments where the
+        // plugin was deployed (a pre-production) run it too.
         Symfony::cacheClear($app);
+        Database::migrate($app);
+        Database::generatePluginMigration($app, 'Remove the 2FA plugin', $schema);
+        Database::migrate($app);
     }
 
     private static function removeBundle(App $app, string $bundle): void

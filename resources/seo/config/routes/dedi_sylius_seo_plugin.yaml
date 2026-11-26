@@ -1,0 +1,4 @@
+# The plugin routes.yaml prefixes them with a hard-coded /admin: follow the admin path of the shop instead.
+dedi_sylius_seo_plugin:
+    resource: "@DediSyliusSEOPlugin/Resources/config/routes/admin_routing.yml"
+    prefix: '/%sylius_admin.path_name%'

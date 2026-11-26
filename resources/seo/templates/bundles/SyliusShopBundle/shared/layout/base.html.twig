@@ -1,0 +1,50 @@
+{#
+    The Sylius shop layout with the SEO title of the Dedi SEO plugin, and its "before_body" hook for the Google Tag
+    Manager iframe. Pages keep setting their own title in the "title" block: it is the title when no SEO content gives one.
+#}
+{% import "@SyliusUi/macro/rtl.html.twig" as rtl %}
+
+{% set generic_hook = 'sylius_shop.base' %}
+{% set prefixes = prefixes|default([])|merge([generic_hook]) %}
+
+<!DOCTYPE html>
+
+<html lang="{{ app.request.locale|slice(0, 2) }}" {{ rtl.default(sylius.localeCode) }}>
+    <head>
+        {% block metatags %}
+            {% hook '#metatags' with { _prefixes: prefixes } %}
+        {% endblock %}
+
+        {% if false %}{% block title %}{{ sylius.channel.name }}{% endblock %}{% endif %}
+        <title>{% block seo_title %}{{ dedi_sylius_seo_get_title(null) ?? block('title') }}{% endblock %}</title>
+
+        {% block stylesheets %}
+            {% hook '#stylesheets' with { _prefixes: prefixes } %}
+        {% endblock %}
+
+        {% hook 'head' with { _prefixes: prefixes } %}
+    </head>
+
+    <body data-route="{{ app.request.attributes.get('_route') }}">
+        {% hook 'before_body' with { _prefixes: prefixes } %}
+
+        {% block body %}
+            <div class="{% apply escape %}{% hook '#body_classes' with { _prefixes: prefixes } %}{% endapply %}">
+                {% block header %}
+                    {% hook 'header' with { _prefixes: prefixes } %}
+                {% endblock %}
+
+                {% block content %}{% endblock %}
+
+                {% block footer %}
+                    {% hook 'footer' with { _prefixes: prefixes } %}
+                {% endblock %}
+            </div>
+            {% hook 'offcanvas' with { _prefixes: prefixes } %}
+        {% endblock %}
+
+        {% block javascripts %}
+            {% hook '#javascripts' with { _prefixes: prefixes } %}
+        {% endblock %}
+    </body>
+</html>

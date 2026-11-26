@@ -36,7 +36,7 @@ enum PluginCategory: string
         return match ($this) {
             self::Payment => 'Take payments online: each gateway adds its payment method.',
             self::Security => 'Protect the accounts and the forms, and handle personal data.',
-            self::Catalog => 'Pages, media and product bundles around the catalog.',
+            self::Catalog => 'Pages, media, SEO and product bundles around the catalog.',
             self::Orders => 'What happens after the checkout, and what customers keep.',
             self::Developer => 'Tooling and monitoring for the people who build the shop.',
         };

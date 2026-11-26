@@ -47,6 +47,9 @@ final readonly class TwoFactorAuthInstaller implements GroupedPluginInstallerInt
     {
         io()->title('Adding 2FA plugin');
 
+        // The mapped schema before the plugin, to generate the migration of the tables it changes.
+        $schema = Database::mappedSchema($app);
+
         // The scheb/2fa-bundle and endroid/qr-code-bundle recipes register their bundles; the plugin has none.
         Composer::allowContribRecipes($app);
         // endroid/qr-code-bundle pulls the endroid/installer Composer plugin, whose trust prompt would block the
@@ -58,7 +61,7 @@ final readonly class TwoFactorAuthInstaller implements GroupedPluginInstallerInt
         Symfony::addBundle($app, 'Endroid\\QrCodeBundle\\EndroidQrCodeBundle');
         Symfony::addBundle($app, 'BitExpert\\SyliusTwoFactorAuthPlugin\\BitExpertSyliusTwoFactorAuthPlugin');
 
-        // The plugin config, the admin and shop firewalls second factor, its routes and the migration of its columns.
+        // The plugin config, the admin and shop firewalls second factor and its routes.
         PluginResourceCopier::copy($app, '2fa');
 
         foreach (self::ENTITIES as $entity) {
@@ -71,6 +74,9 @@ final readonly class TwoFactorAuthInstaller implements GroupedPluginInstallerInt
 
         Symfony::cacheClear($app);
         Docker::run($app, 'bin/console assets:install public');
+        // The columns of the second factor, in a migration generated once the others are run.
+        Database::migrate($app);
+        Database::generatePluginMigration($app, 'Add the 2FA plugin', $schema);
         Database::migrate($app);
     }
 }
