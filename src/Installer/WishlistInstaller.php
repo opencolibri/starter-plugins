@@ -13,7 +13,7 @@ use OpenColibri\Starter\Core\Util\Symfony;
 
 use function Castor\io;
 
-final readonly class WishlistInstaller implements PluginInstallerInterface
+final readonly class WishlistInstaller implements GroupedPluginInstallerInterface
 {
     public function name(): string
     {
@@ -28,6 +28,11 @@ final readonly class WishlistInstaller implements PluginInstallerInterface
     public function package(): string
     {
         return 'sylius/wishlist-plugin';
+    }
+
+    public function group(): string
+    {
+        return self::ORDERS;
     }
 
     public function __invoke(App $app): void

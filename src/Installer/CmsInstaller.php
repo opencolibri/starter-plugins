@@ -13,7 +13,7 @@ use OpenColibri\Starter\Core\Util\Symfony;
 
 use function Castor\io;
 
-final readonly class CmsInstaller implements PluginInstallerInterface
+final readonly class CmsInstaller implements GroupedPluginInstallerInterface
 {
     public function name(): string
     {
@@ -28,6 +28,11 @@ final readonly class CmsInstaller implements PluginInstallerInterface
     public function package(): string
     {
         return 'sylius/cms-plugin';
+    }
+
+    public function group(): string
+    {
+        return self::CATALOG;
     }
 
     public function __invoke(App $app): void

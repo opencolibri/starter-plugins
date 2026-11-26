@@ -13,7 +13,7 @@ use OpenColibri\Starter\Plugins\PluginResourceCopier;
 
 use function Castor\io;
 
-final readonly class RecaptchaInstaller implements PluginInstallerInterface
+final readonly class RecaptchaInstaller implements GroupedPluginInstallerInterface
 {
     public function name(): string
     {
@@ -28,6 +28,11 @@ final readonly class RecaptchaInstaller implements PluginInstallerInterface
     public function package(): string
     {
         return 'karser/karser-recaptcha3-bundle';
+    }
+
+    public function group(): string
+    {
+        return self::SECURITY;
     }
 
     public function __invoke(App $app): void

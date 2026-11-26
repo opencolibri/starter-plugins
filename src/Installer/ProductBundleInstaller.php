@@ -14,7 +14,7 @@ use OpenColibri\Starter\Core\Util\Symfony;
 
 use function Castor\io;
 
-final readonly class ProductBundleInstaller implements PluginInstallerInterface
+final readonly class ProductBundleInstaller implements GroupedPluginInstallerInterface
 {
     public function name(): string
     {
@@ -29,6 +29,11 @@ final readonly class ProductBundleInstaller implements PluginInstallerInterface
     public function package(): string
     {
         return 'sylius/product-bundle-plugin';
+    }
+
+    public function group(): string
+    {
+        return self::CATALOG;
     }
 
     public function __invoke(App $app): void

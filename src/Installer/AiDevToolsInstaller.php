@@ -10,7 +10,7 @@ use OpenColibri\Starter\Core\Util\Docker;
 
 use function Castor\io;
 
-final readonly class AiDevToolsInstaller implements PluginInstallerInterface
+final readonly class AiDevToolsInstaller implements GroupedPluginInstallerInterface
 {
     public function name(): string
     {
@@ -25,6 +25,11 @@ final readonly class AiDevToolsInstaller implements PluginInstallerInterface
     public function package(): string
     {
         return 'sylius/sylius-ai-dev-tools';
+    }
+
+    public function group(): string
+    {
+        return self::DEVELOPER;
     }
 
     public function __invoke(App $app): void

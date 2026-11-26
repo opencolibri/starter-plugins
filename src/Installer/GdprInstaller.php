@@ -12,7 +12,7 @@ use OpenColibri\Starter\Core\Util\Symfony;
 use function Castor\fs;
 use function Castor\io;
 
-final readonly class GdprInstaller implements PluginInstallerInterface
+final readonly class GdprInstaller implements GroupedPluginInstallerInterface
 {
     public function name(): string
     {
@@ -27,6 +27,11 @@ final readonly class GdprInstaller implements PluginInstallerInterface
     public function package(): string
     {
         return 'synolia/sylius-gdpr-plugin';
+    }
+
+    public function group(): string
+    {
+        return self::SECURITY;
     }
 
     public function __invoke(App $app): void

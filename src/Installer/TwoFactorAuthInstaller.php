@@ -14,7 +14,7 @@ use OpenColibri\Starter\Plugins\PluginResourceCopier;
 
 use function Castor\io;
 
-final readonly class TwoFactorAuthInstaller implements PluginInstallerInterface
+final readonly class TwoFactorAuthInstaller implements GroupedPluginInstallerInterface
 {
     public const string INTERFACE = 'BitExpert\\SyliusTwoFactorAuthPlugin\\Entity\\TwoFactorAuthInterface';
 
@@ -36,6 +36,11 @@ final readonly class TwoFactorAuthInstaller implements PluginInstallerInterface
     public function package(): string
     {
         return 'bitexpert/sylius-2fa-plugin';
+    }
+
+    public function group(): string
+    {
+        return self::SECURITY;
     }
 
     public function __invoke(App $app): void

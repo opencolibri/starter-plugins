@@ -13,7 +13,7 @@ use OpenColibri\Starter\Plugins\Attribute\AsPluginInstaller;
 use function Castor\fs;
 use function Castor\io;
 
-final readonly class BugSnagInstaller implements PluginInstallerInterface
+final readonly class BugSnagInstaller implements GroupedPluginInstallerInterface
 {
     public function name(): string
     {
@@ -28,6 +28,11 @@ final readonly class BugSnagInstaller implements PluginInstallerInterface
     public function package(): string
     {
         return 'bugsnag/bugsnag-symfony';
+    }
+
+    public function group(): string
+    {
+        return self::DEVELOPER;
     }
 
     public function __invoke(App $app): void

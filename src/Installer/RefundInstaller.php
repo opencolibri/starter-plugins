@@ -13,7 +13,7 @@ use OpenColibri\Starter\Core\Util\Symfony;
 use function Castor\fs;
 use function Castor\io;
 
-final readonly class RefundInstaller implements PluginInstallerInterface
+final readonly class RefundInstaller implements GroupedPluginInstallerInterface
 {
     public function name(): string
     {
@@ -28,6 +28,11 @@ final readonly class RefundInstaller implements PluginInstallerInterface
     public function package(): string
     {
         return 'sylius/refund-plugin';
+    }
+
+    public function group(): string
+    {
+        return self::ORDERS;
     }
 
     public function __invoke(App $app): void

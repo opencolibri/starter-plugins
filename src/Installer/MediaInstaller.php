@@ -17,7 +17,7 @@ use OpenColibri\Starter\Plugins\PluginResourceCopier;
 use function Castor\fs;
 use function Castor\io;
 
-final readonly class MediaInstaller implements PluginInstallerInterface
+final readonly class MediaInstaller implements GroupedPluginInstallerInterface
 {
     public function name(): string
     {
@@ -32,6 +32,11 @@ final readonly class MediaInstaller implements PluginInstallerInterface
     public function package(): string
     {
         return 'jolicode/media-bundle';
+    }
+
+    public function group(): string
+    {
+        return self::CATALOG;
     }
 
     public function __invoke(App $app): void

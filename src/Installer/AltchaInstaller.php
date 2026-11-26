@@ -14,7 +14,7 @@ use OpenColibri\Starter\Plugins\PluginResourceCopier;
 use function Castor\fs;
 use function Castor\io;
 
-final readonly class AltchaInstaller implements PluginInstallerInterface
+final readonly class AltchaInstaller implements GroupedPluginInstallerInterface
 {
     public function name(): string
     {
@@ -29,6 +29,11 @@ final readonly class AltchaInstaller implements PluginInstallerInterface
     public function package(): string
     {
         return 'tito10047/altcha-bundle';
+    }
+
+    public function group(): string
+    {
+        return self::SECURITY;
     }
 
     public function __invoke(App $app): void

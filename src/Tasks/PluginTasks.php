@@ -12,6 +12,7 @@ use OpenColibri\Starter\Core\Component\InstallerInterface;
 use OpenColibri\Starter\Core\Component\RemoverInterface;
 use OpenColibri\Starter\Plugins\Installer\GroupedPluginInstallerInterface;
 use OpenColibri\Starter\Plugins\Installer\PluginInstallerInterface;
+use OpenColibri\Starter\Plugins\PluginCategory;
 
 use function Castor\io;
 
@@ -212,6 +213,18 @@ final class PluginTasks
         ksort($descriptions);
 
         return $descriptions;
+    }
+
+    /**
+     * @return array<string, array{name: string, label: string, description: ?string}|null> the category of each plugin
+     *                                                                                        (see PluginCategory), sorted by name
+     */
+    public static function categories(): array
+    {
+        $categories = array_map(PluginCategory::describe(...), self::$installers);
+        ksort($categories);
+
+        return $categories;
     }
 
     /**
