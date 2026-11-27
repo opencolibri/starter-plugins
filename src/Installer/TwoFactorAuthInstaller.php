@@ -11,6 +11,7 @@ use OpenColibri\Starter\Core\Util\Database;
 use OpenColibri\Starter\Core\Util\Docker;
 use OpenColibri\Starter\Core\Util\Symfony;
 use OpenColibri\Starter\Plugins\PluginResourceCopier;
+use OpenColibri\Starter\Plugins\PluginRemoval;
 
 use function Castor\io;
 
@@ -76,7 +77,7 @@ final readonly class TwoFactorAuthInstaller implements GroupedPluginInstallerInt
         Docker::run($app, 'bin/console assets:install public');
         // The columns of the second factor, in a migration generated once the others are run.
         Database::migrate($app);
-        Database::generatePluginMigration($app, 'Add the 2FA plugin', $schema);
+        Database::generatePluginMigration($app, PluginRemoval::addDescription('2FA'), $schema);
         Database::migrate($app);
     }
 }

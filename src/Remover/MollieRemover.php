@@ -14,6 +14,7 @@ use OpenColibri\Starter\Core\Util\Docker;
 use OpenColibri\Starter\Core\Util\Javascript;
 use OpenColibri\Starter\Core\Util\Symfony;
 use OpenColibri\Starter\Plugins\Installer\MollieInstaller;
+use OpenColibri\Starter\Plugins\PluginRemoval;
 
 use function Castor\io;
 
@@ -34,10 +35,8 @@ final readonly class MollieRemover implements RemoverInterface
         io()->title('Removing Mollie plugin');
 
         Composer::allowContribRecipes($app);
-        // The mapped schema before the plugin, to generate the migration of the tables it changes.
-        $schema = Database::mappedSchema($app);
-        // Its migrations stay executed once its tables are dropped: forget them, so a reinstall runs them again.
-        $migrations = Database::pluginMigrations($app, 'Sylius\MolliePlugin\Migrations');
+        // Rolls back a plugin that never left this application, or prepares the migration dropping its tables.
+        $removal = PluginRemoval::start($app, 'Mollie', 'sylius/mollie-plugin', 'Sylius\MolliePlugin\Migrations');
 
         // Only the constructor the installer added: it initializes the Mollie gateway config.
         $gatewayConfig = $app->directory() . '/' . MollieInstaller::GATEWAY_CONFIG;
@@ -64,10 +63,6 @@ final readonly class MollieRemover implements RemoverInterface
         Symfony::cacheClear($app);
         Docker::run($app, 'bin/console assets:install public');
         Assets::build($app);
-        // Drop its tables in a new migration rather than rolling back the plugin ones: the other environments where the
-        // plugin was deployed (a pre-production) run it too.
-        Database::migrate($app);
-        Database::generatePluginMigration($app, 'Remove the Mollie plugin', $schema, $migrations);
-        Database::migrate($app);
+        $removal->finish($app);
     }
 }

@@ -11,6 +11,7 @@ use OpenColibri\Starter\Core\Util\Composer;
 use OpenColibri\Starter\Core\Util\Database;
 use OpenColibri\Starter\Core\Util\Docker;
 use OpenColibri\Starter\Core\Util\Symfony;
+use OpenColibri\Starter\Plugins\PluginRemoval;
 
 use function Castor\io;
 
@@ -30,19 +31,13 @@ final readonly class CmsRemover implements RemoverInterface
     {
         io()->title('Removing CMS plugin');
 
-        // The mapped schema before the plugin, to generate the migration of the tables it changes.
-        $schema = Database::mappedSchema($app);
-        // Its migrations stay executed once its tables are dropped: forget them, so a reinstall runs them again.
-        $migrations = Database::pluginMigrations($app, 'Sylius\CmsPlugin\Migrations');
+        // Rolls back a plugin that never left this application, or prepares the migration dropping its tables.
+        $removal = PluginRemoval::start($app, 'CMS', 'sylius/cms-plugin', 'Sylius\CmsPlugin\Migrations');
 
         Composer::allowContribRecipes($app);
         Docker::run($app, 'composer remove sylius/cms-plugin');
         Assets::build($app);
-        // Drop its tables in a new migration rather than rolling back the plugin ones: the other environments where the
-        // plugin was deployed (a pre-production) run it too.
         Symfony::cacheClear($app);
-        Database::migrate($app);
-        Database::generatePluginMigration($app, 'Remove the CMS plugin', $schema, $migrations);
-        Database::migrate($app);
+        $removal->finish($app);
     }
 }

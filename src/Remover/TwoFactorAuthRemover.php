@@ -12,6 +12,7 @@ use OpenColibri\Starter\Core\Util\Database;
 use OpenColibri\Starter\Core\Util\Docker;
 use OpenColibri\Starter\Core\Util\Symfony;
 use OpenColibri\Starter\Plugins\Installer\TwoFactorAuthInstaller;
+use OpenColibri\Starter\Plugins\PluginRemoval;
 
 use function Castor\finder;
 use function Castor\fs;
@@ -33,8 +34,8 @@ final readonly class TwoFactorAuthRemover implements RemoverInterface
     {
         io()->title('Removing 2FA plugin');
 
-        // The mapped schema before the plugin, to generate the migration of the tables it changes.
-        $schema = Database::mappedSchema($app);
+        // Rolls back a plugin that never left this application, or prepares the migration dropping its tables.
+        $removal = PluginRemoval::start($app, '2FA', 'bitexpert/sylius-2fa-plugin');
 
         Composer::allowContribRecipes($app);
 
@@ -61,12 +62,8 @@ final readonly class TwoFactorAuthRemover implements RemoverInterface
         Docker::run($app, 'composer remove bitexpert/sylius-2fa-plugin');
         Docker::run($app, 'composer config --unset allow-plugins.endroid/installer');
 
-        // Drop its tables in a new migration rather than rolling back the plugin ones: the other environments where the
-        // plugin was deployed (a pre-production) run it too.
         Symfony::cacheClear($app);
-        Database::migrate($app);
-        Database::generatePluginMigration($app, 'Remove the 2FA plugin', $schema);
-        Database::migrate($app);
+        $removal->finish($app);
     }
 
     private static function removeBundle(App $app, string $bundle): void

@@ -12,6 +12,7 @@ use OpenColibri\Starter\Core\Util\Database;
 use OpenColibri\Starter\Core\Util\Docker;
 use OpenColibri\Starter\Core\Util\Symfony;
 use OpenColibri\Starter\Core\Util\Yaml;
+use OpenColibri\Starter\Plugins\PluginRemoval;
 
 use function Castor\fs;
 use function Castor\io;
@@ -136,7 +137,7 @@ final readonly class MediaInstaller implements GroupedPluginInstallerInterface
         Symfony::cacheClear($app);
         // The media columns, in a migration generated once the others are run, which points them at the current images.
         Database::migrate($app);
-        $migration = Database::generatePluginMigration($app, 'Add the media plugin', $schema);
+        $migration = Database::generatePluginMigration($app, PluginRemoval::addDescription('media'), $schema);
 
         if (null !== $migration) {
             (new PhpFile($migration))

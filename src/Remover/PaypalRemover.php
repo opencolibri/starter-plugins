@@ -12,6 +12,7 @@ use OpenColibri\Starter\Core\Util\Database;
 use OpenColibri\Starter\Core\Util\Docker;
 use OpenColibri\Starter\Core\Util\Javascript;
 use OpenColibri\Starter\Core\Util\Symfony;
+use OpenColibri\Starter\Plugins\PluginRemoval;
 
 use function Castor\io;
 
@@ -31,10 +32,8 @@ final readonly class PaypalRemover implements RemoverInterface
     {
         io()->title('Removing PayPal plugin');
 
-        // The mapped schema before the plugin, to generate the migration of the tables it changes.
-        $schema = Database::mappedSchema($app);
-        // Its migrations stay executed once its tables are dropped: forget them, so a reinstall runs them again.
-        $migrations = Database::pluginMigrations($app, 'Sylius\PayPalPlugin\Migrations');
+        // Rolls back a plugin that never left this application, or prepares the migration dropping its tables.
+        $removal = PluginRemoval::start($app, 'PayPal', 'sylius/paypal-plugin', 'Sylius\PayPalPlugin\Migrations');
 
         Composer::allowContribRecipes($app);
         // Sylius-Standard 2.3+ imports the plugin assets in its entrypoints, which Encore would no longer find.
@@ -43,11 +42,7 @@ final readonly class PaypalRemover implements RemoverInterface
         // Flex drops the plugin Stimulus controllers from package.json: the node modules and the build follow.
         Docker::run($app, 'yarn install');
         Assets::build($app);
-        // Drop its tables in a new migration rather than rolling back the plugin ones: the other environments where the
-        // plugin was deployed (a pre-production) run it too.
         Symfony::cacheClear($app);
-        Database::migrate($app);
-        Database::generatePluginMigration($app, 'Remove the PayPal plugin', $schema, $migrations);
-        Database::migrate($app);
+        $removal->finish($app);
     }
 }

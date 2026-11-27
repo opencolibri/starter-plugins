@@ -11,6 +11,7 @@ use OpenColibri\Starter\Core\Util\Database;
 use OpenColibri\Starter\Core\Util\Docker;
 use OpenColibri\Starter\Core\Util\Symfony;
 use OpenColibri\Starter\Plugins\PluginResourceCopier;
+use OpenColibri\Starter\Plugins\PluginRemoval;
 
 use function Castor\io;
 
@@ -166,7 +167,7 @@ final readonly class SeoInstaller implements GroupedPluginInstallerInterface
         Docker::run($app, 'bin/console assets:install public');
         // The plugin only ships a 3.x to 4.x data migration: generate the one of its tables, once the others are run.
         Database::migrate($app);
-        Database::generatePluginMigration($app, 'Add the SEO plugin', $schema);
+        Database::generatePluginMigration($app, PluginRemoval::addDescription('SEO'), $schema);
         Database::migrate($app);
     }
 }
