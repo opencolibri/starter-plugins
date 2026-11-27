@@ -22,7 +22,7 @@ final readonly class CmsInstaller implements GroupedPluginInstallerInterface
 
     public function description(): string
     {
-        return 'CMS plugin for Sylius applications';
+        return 'CMS plugin for Sylius applications, by Sylius';
     }
 
     public function package(): string

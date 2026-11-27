@@ -23,7 +23,7 @@ final readonly class InvoicingRemover implements RemoverInterface
 
     public function description(): string
     {
-        return 'Invoicing plugin for Sylius';
+        return 'Invoicing plugin for Sylius, by Sylius';
     }
 
     public function __invoke(App $app): void

@@ -23,7 +23,7 @@ final readonly class AltchaRemover implements RemoverInterface
 
     public function description(): string
     {
-        return 'Remove ALTCHA from customer registration';
+        return 'Remove ALTCHA from customer registration, by tito10047';
     }
 
     public function __invoke(App $app): void

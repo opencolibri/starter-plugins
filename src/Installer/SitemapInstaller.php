@@ -22,7 +22,7 @@ final readonly class SitemapInstaller implements GroupedPluginInstallerInterface
 
     public function description(): string
     {
-        return 'XML sitemap of the products, taxons and static pages';
+        return 'XML sitemap of the products, taxons and static pages, by Stefan Doorn';
     }
 
     public function package(): string

@@ -20,7 +20,7 @@ final readonly class BugSnagRemover implements RemoverInterface
 
     public function description(): string
     {
-        return 'Official BugSnag notifier for Symfony applications';
+        return 'Official BugSnag notifier for Symfony applications, by Bugsnag';
     }
 
     public function __invoke(App $app): void

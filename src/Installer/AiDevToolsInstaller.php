@@ -19,7 +19,7 @@ final readonly class AiDevToolsInstaller implements GroupedPluginInstallerInterf
 
     public function description(): string
     {
-        return 'Dev-only AI tooling for Sylius';
+        return 'Dev-only AI tooling for Sylius, by Sylius';
     }
 
     public function package(): string

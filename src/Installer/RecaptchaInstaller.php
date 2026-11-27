@@ -22,7 +22,7 @@ final readonly class RecaptchaInstaller implements GroupedPluginInstallerInterfa
 
     public function description(): string
     {
-        return 'Add Google reCAPTCHA v3 to customer registration';
+        return 'Add Google reCAPTCHA v3 to customer registration, by karser';
     }
 
     public function package(): string

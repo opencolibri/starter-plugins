@@ -23,7 +23,7 @@ final readonly class StripeRemover implements RemoverInterface
 
     public function description(): string
     {
-        return 'Stripe payment gateway (Checkout, Payment Element, express checkout)';
+        return 'Stripe payment gateway (Checkout, Payment Element, express checkout), by FLUX-SE';
     }
 
     public function __invoke(App $app): void

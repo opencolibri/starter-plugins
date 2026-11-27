@@ -24,7 +24,7 @@ final readonly class WishlistRemover implements RemoverInterface
 
     public function description(): string
     {
-        return 'Wishlist plugin for Sylius';
+        return 'Wishlist plugin for Sylius, by Sylius';
     }
 
     public function __invoke(App $app): void

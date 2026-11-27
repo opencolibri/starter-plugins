@@ -1,0 +1,5 @@
+imports:
+    # The plugin config.yaml only declares its "european_vat_zones" fixture suite, which creates every country: the
+    # installer creates the European Union zone itself.
+    - { resource: "@FluxSESyliusEUVatPlugin/config/admin.yaml" }
+    - { resource: "@FluxSESyliusEUVatPlugin/config/shop.yaml" }

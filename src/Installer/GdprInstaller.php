@@ -21,7 +21,7 @@ final readonly class GdprInstaller implements GroupedPluginInstallerInterface
 
     public function description(): string
     {
-        return 'Synolia sylius GDPR plugin';
+        return 'GDPR plugin for Sylius, by Synolia';
     }
 
     public function package(): string

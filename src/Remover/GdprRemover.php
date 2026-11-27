@@ -22,7 +22,7 @@ final readonly class GdprRemover implements RemoverInterface
 
     public function description(): string
     {
-        return 'Synolia sylius GDPR plugin';
+        return 'GDPR plugin for Sylius, by Synolia';
     }
 
     public function __invoke(App $app): void

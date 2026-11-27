@@ -21,6 +21,9 @@ use function Castor\io;
  *
  * Outside a git repository (or in one that ignores the application), nothing proves the plugin was not deployed: it
  * gets a migration.
+ *
+ * A plugin whose migrations cannot be rolled back on every platform (a down() written for MySQL only) is rolled back
+ * with a migration generated from the mapping instead (see start()), run then discarded.
  */
 final readonly class PluginRemoval
 {
@@ -33,6 +36,7 @@ final readonly class PluginRemoval
         private bool $deployed,
         private array $schema,
         private array $migrations,
+        private bool $rollbackWithDiff = false,
     ) {}
 
     /**
@@ -49,8 +53,10 @@ final readonly class PluginRemoval
      * @param string      $label               the plugin name in the migration descriptions ("SEO")
      * @param string      $package             the Composer package of the plugin
      * @param string|null $migrationsNamespace the namespace of the migrations the plugin ships, if any
+     * @param bool        $rollbackWithDiff    roll back with a migration generated from the mapping, run then discarded,
+     *                                         rather than with the down() of the plugin migrations
      */
-    public static function start(App $app, string $label, string $package, ?string $migrationsNamespace = null): self
+    public static function start(App $app, string $label, string $package, ?string $migrationsNamespace = null, bool $rollbackWithDiff = false): self
     {
         $generated = Database::generatedMigrations($app, [self::addDescription($label), self::removeDescription($label)]);
 
@@ -72,6 +78,16 @@ final readonly class PluginRemoval
             static fn(string $path): bool => false === self::committedFile($app, $path),
         )));
 
+        if ($rollbackWithDiff) {
+            return new self(
+                $label,
+                false,
+                Database::mappedSchema($app),
+                null === $migrationsNamespace ? [] : Database::pluginMigrations($app, $migrationsNamespace),
+                true,
+            );
+        }
+
         if (null !== $migrationsNamespace) {
             Database::rollbackPluginMigrations($app, $migrationsNamespace);
         }
@@ -85,13 +101,18 @@ final readonly class PluginRemoval
      */
     public function finish(App $app): void
     {
-        if (!$this->deployed) {
+        if (!$this->deployed && !$this->rollbackWithDiff) {
             return;
         }
 
         Database::migrate($app);
-        Database::generatePluginMigration($app, self::removeDescription($this->label), $this->schema, $this->migrations);
+        $migration = Database::generatePluginMigration($app, self::removeDescription($this->label), $this->schema, $this->migrations);
         Database::migrate($app);
+
+        if (!$this->deployed && null !== $migration) {
+            // A plugin that never left this application leaves no migration behind.
+            Database::forgetGeneratedMigration($app, $migration);
+        }
     }
 
     /**

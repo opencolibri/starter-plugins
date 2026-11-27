@@ -31,7 +31,7 @@ final readonly class TwoFactorAuthInstaller implements GroupedPluginInstallerInt
 
     public function description(): string
     {
-        return 'Two-factor authentication (authenticator app or email) for admin and shop users';
+        return 'Two-factor authentication (authenticator app or email) for admin and shop users, by bitExpert';
     }
 
     public function package(): string

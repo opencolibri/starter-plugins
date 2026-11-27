@@ -23,7 +23,7 @@ final readonly class AltchaInstaller implements GroupedPluginInstallerInterface
 
     public function description(): string
     {
-        return 'Add ALTCHA (self-hosted, privacy-friendly captcha) to customer registration';
+        return 'Add ALTCHA (self-hosted, privacy-friendly captcha) to customer registration, by tito10047';
     }
 
     public function package(): string

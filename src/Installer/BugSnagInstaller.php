@@ -22,7 +22,7 @@ final readonly class BugSnagInstaller implements GroupedPluginInstallerInterface
 
     public function description(): string
     {
-        return 'Official BugSnag notifier for Symfony applications';
+        return 'Official BugSnag notifier for Symfony applications, by Bugsnag';
     }
 
     public function package(): string

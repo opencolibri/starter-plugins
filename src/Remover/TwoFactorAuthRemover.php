@@ -27,7 +27,7 @@ final readonly class TwoFactorAuthRemover implements RemoverInterface
 
     public function description(): string
     {
-        return 'Remove two-factor authentication from admin and shop users';
+        return 'Remove two-factor authentication from admin and shop users, by bitExpert';
     }
 
     public function __invoke(App $app): void

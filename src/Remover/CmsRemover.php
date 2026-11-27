@@ -24,7 +24,7 @@ final readonly class CmsRemover implements RemoverInterface
 
     public function description(): string
     {
-        return 'CMS plugin for Sylius applications';
+        return 'CMS plugin for Sylius applications, by Sylius';
     }
 
     public function __invoke(App $app): void

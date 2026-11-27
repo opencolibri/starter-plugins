@@ -21,7 +21,7 @@ final readonly class AiDevToolsRemover implements RemoverInterface
 
     public function description(): string
     {
-        return 'Dev-only AI tooling for Sylius';
+        return 'Dev-only AI tooling for Sylius, by Sylius';
     }
 
     public function __invoke(App $app): void

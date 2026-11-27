@@ -23,7 +23,7 @@ final readonly class SitemapRemover implements RemoverInterface
 
     public function description(): string
     {
-        return 'Remove the sitemap plugin and its generated sitemaps';
+        return 'Remove the sitemap plugin and its generated sitemaps, by Stefan Doorn';
     }
 
     public function __invoke(App $app): void

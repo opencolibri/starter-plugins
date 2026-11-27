@@ -23,7 +23,7 @@ final readonly class RecaptchaRemover implements RemoverInterface
 
     public function description(): string
     {
-        return 'Remove Google reCAPTCHA v3 to customer registration';
+        return 'Remove Google reCAPTCHA v3 from customer registration, by karser';
     }
 
     public function __invoke(App $app): void

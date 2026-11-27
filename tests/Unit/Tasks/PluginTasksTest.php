@@ -69,7 +69,7 @@ final class PluginTasksTest extends TestCase
     public function testItLabelsChoicesWithTheDescription(): void
     {
         static::assertSame([
-            'cms' => 'cms - CMS plugin for Sylius applications',
+            'cms' => 'cms - CMS plugin for Sylius applications, by Sylius',
         ], PluginTasks::choices(['cms' => new CmsInstaller()]));
     }
 
@@ -102,12 +102,12 @@ final class PluginTasksTest extends TestCase
         PluginTasks::addRemover(new ApiRemover());
 
         static::assertSame([
-            'cms' => 'cms - CMS plugin for Sylius applications',
-            'product_bundle' => 'product_bundle - Product bundle for Sylius',
+            'cms' => 'cms - CMS plugin for Sylius applications, by Sylius',
+            'product_bundle' => 'product_bundle - Product bundle for Sylius, by Sylius',
         ], PluginTasks::choices((new \ReflectionProperty(PluginTasks::class, 'installers'))->getValue()));
 
         static::assertSame([
-            'api' => 'api - Sylius API and its test tooling',
+            'api' => 'api - Sylius API and its test tooling, by Sylius',
         ], PluginTasks::choices((new \ReflectionProperty(PluginTasks::class, 'removers'))->getValue()));
     }
 
@@ -133,7 +133,7 @@ final class PluginTasksTest extends TestCase
             ->method('choice')
             ->with(
                 'Which plugins would you like to install?',
-                ['cms' => 'cms - CMS plugin for Sylius applications'],
+                ['cms' => 'cms - CMS plugin for Sylius applications, by Sylius'],
                 null,
                 true,
             )
@@ -157,7 +157,7 @@ final class PluginTasksTest extends TestCase
             ->method('choice')
             ->with(
                 'Which plugins would you like to remove?',
-                ['api' => 'api - Sylius API and its test tooling'],
+                ['api' => 'api - Sylius API and its test tooling, by Sylius'],
                 null,
                 true,
             )

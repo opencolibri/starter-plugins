@@ -27,7 +27,7 @@ final readonly class SeoRemover implements RemoverInterface
 
     public function description(): string
     {
-        return 'Remove the Dedi SEO plugin and its SEO contents';
+        return 'Remove the SEO plugin and its SEO contents, by Dedi';
     }
 
     public function __invoke(App $app): void

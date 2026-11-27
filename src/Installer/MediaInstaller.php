@@ -29,7 +29,7 @@ final readonly class MediaInstaller implements GroupedPluginInstallerInterface
 
     public function description(): string
     {
-        return 'Media management bundle for Symfony applications';
+        return 'Media management bundle for Symfony applications, by JoliCode';
     }
 
     public function package(): string

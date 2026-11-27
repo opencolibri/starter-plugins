@@ -21,7 +21,7 @@ final readonly class PaypalInstaller implements GroupedPluginInstallerInterface
 
     public function description(): string
     {
-        return 'PayPal payment gateway (PayPal Commerce Platform)';
+        return 'PayPal payment gateway (PayPal Commerce Platform), by Sylius';
     }
 
     public function package(): string

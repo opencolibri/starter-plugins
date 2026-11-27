@@ -21,7 +21,7 @@ final readonly class StripeInstaller implements GroupedPluginInstallerInterface
 
     public function description(): string
     {
-        return 'Stripe payment gateway (Checkout, Payment Element, express checkout)';
+        return 'Stripe payment gateway (Checkout, Payment Element, express checkout), by FLUX-SE';
     }
 
     public function package(): string

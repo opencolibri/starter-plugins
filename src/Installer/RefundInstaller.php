@@ -22,7 +22,7 @@ final readonly class RefundInstaller implements GroupedPluginInstallerInterface
 
     public function description(): string
     {
-        return 'Basic refunds functionality for Sylius';
+        return 'Basic refunds functionality for Sylius, by Sylius';
     }
 
     public function package(): string

@@ -23,7 +23,7 @@ final readonly class ProductBundleInstaller implements GroupedPluginInstallerInt
 
     public function description(): string
     {
-        return 'Product bundle for Sylius';
+        return 'Product bundle for Sylius, by Sylius';
     }
 
     public function package(): string

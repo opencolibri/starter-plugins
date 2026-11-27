@@ -25,7 +25,7 @@ final readonly class PaypalRemover implements RemoverInterface
 
     public function description(): string
     {
-        return 'PayPal payment gateway (PayPal Commerce Platform)';
+        return 'PayPal payment gateway (PayPal Commerce Platform), by Sylius';
     }
 
     public function __invoke(App $app): void

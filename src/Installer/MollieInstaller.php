@@ -66,7 +66,7 @@ final readonly class MollieInstaller implements GroupedPluginInstallerInterface
 
     public function description(): string
     {
-        return 'Mollie payment gateway (cards, iDEAL, Bancontact, Klarna...)';
+        return 'Mollie payment gateway (cards, iDEAL, Bancontact, Klarna...), by Sylius';
     }
 
     public function package(): string

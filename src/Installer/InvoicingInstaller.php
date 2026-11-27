@@ -22,7 +22,7 @@ final readonly class InvoicingInstaller implements GroupedPluginInstallerInterfa
 
     public function description(): string
     {
-        return 'Invoicing plugin for Sylius';
+        return 'Invoicing plugin for Sylius, by Sylius';
     }
 
     public function package(): string

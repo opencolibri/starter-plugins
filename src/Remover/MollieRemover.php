@@ -27,7 +27,7 @@ final readonly class MollieRemover implements RemoverInterface
 
     public function description(): string
     {
-        return 'Mollie payment gateway (cards, iDEAL, Bancontact, Klarna...)';
+        return 'Mollie payment gateway (cards, iDEAL, Bancontact, Klarna...), by Sylius';
     }
 
     public function __invoke(App $app): void

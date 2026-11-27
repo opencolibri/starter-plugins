@@ -113,7 +113,7 @@ final readonly class SeoInstaller implements GroupedPluginInstallerInterface
 
     public function description(): string
     {
-        return 'Dedi SEO: metadata, OpenGraph, noindex rules and rich snippets';
+        return 'SEO metadata, OpenGraph, noindex rules and rich snippets, by Dedi';
     }
 
     public function package(): string

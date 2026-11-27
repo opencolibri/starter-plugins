@@ -22,7 +22,7 @@ final readonly class WishlistInstaller implements GroupedPluginInstallerInterfac
 
     public function description(): string
     {
-        return 'Wishlist plugin for Sylius';
+        return 'Wishlist plugin for Sylius, by Sylius';
     }
 
     public function package(): string

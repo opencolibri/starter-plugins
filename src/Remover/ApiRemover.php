@@ -21,7 +21,7 @@ final readonly class ApiRemover implements RemoverInterface
 
     public function description(): string
     {
-        return 'Sylius API and its test tooling';
+        return 'Sylius API and its test tooling, by Sylius';
     }
 
     public function __invoke(App $app): void
